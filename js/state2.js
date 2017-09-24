@@ -29,7 +29,10 @@ demo.state2.prototype = {
         player.body.collideWorldBounds = true;
         
         
+<<<<<<< HEAD
         
+=======
+>>>>>>> 43eb8f86bbfdb26253e3d86f5e72d6e3aca42992
 //        scoreText = game.add.text(16, 16, 'score: 0',                 {fontSize: '32px', fill: '#dabbed'});
         
         cursors = game.input.keyboard.createCursorKeys();
@@ -59,7 +62,5 @@ demo.state2.prototype = {
         {
                 player.body.velocity.y = 250;
         }
-    }
-
-    
+    }  
 };
