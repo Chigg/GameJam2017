@@ -8,7 +8,7 @@ demo.state2 = function(){};
 demo.state2.prototype = {
     preload: function(){
         game.load.image('grass', 'assets/grass.png');
-        game.load.spritesheet('player', 'assets/Carrot.png', 25, 50);
+        game.load.spritesheet('player', 'assets/Carrot.png', 400, 100);
         
     },
     create: function(){
