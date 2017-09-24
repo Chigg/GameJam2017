@@ -12,18 +12,21 @@ demo.state2.prototype = {
         
     },
     create: function(){
-        background = game.add.tileSprite(0, 0, 600, 400, 'grass')
+        background = game.add.tileSprite(0, 0, 1920, 1920, 'grass');
+        game.world.setBounds(0, 0, 1920, 1920);
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         game.stage.backgroundColor = '#008000';
         
-        game.physics.startSystem(Phaser.Physics.ARCADE);
+        //game.physics.startSystem(Phaser.Physics.ARCADE);
         
-        player = game.add.sprite(400 / 2, 300 / 2, 'player')
+        player = game.add.sprite(game.world.centerX, game.world.centerY, 'player')
         game.physics.arcade.enable(player);
+        game.camera.follow(player);
         
         player.body.bounce.y = 0;
         player.body.gravity.y = 0;
         player.body.collideWorldBounds = true;
+        
         
 //        scoreText = game.add.text(16, 16, 'score: 0',                 {fontSize: '32px', fill: '#dabbed'});
         
@@ -51,7 +54,5 @@ demo.state2.prototype = {
         {
                 player.body.velocity.y = 150;
         }
-    }
-
-    
+    }  
 };
