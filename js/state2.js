@@ -7,6 +7,8 @@ var fireRate = 100;
 var nextFire = 0;
 var meleeSound;
 var healthpoints;
+var trees;
+var tree;
 var look_left = false;
 
 demo.state2 = function(){};
@@ -17,6 +19,7 @@ demo.state2.prototype = {
         game.load.spritesheet('baddie', 'assets/Carrot.png', 50, 62);
         game.load.image('bullet', 'assets/pan.png', 25, 25);
         game.load.audio('melee_sound', 'assets/audio/melee_sound.mp3');
+        game.load.image('tree', 'assets/tree.png', 50, 100);
         
     },
     create: function(){
@@ -28,7 +31,11 @@ demo.state2.prototype = {
         game.physics.startSystem(Phaser.Physics.ARCADE);
         
         player = game.add.sprite(game.world.centerX, game.world.centerY, 'player')
+        player.enableBody = true;
+        player.physicsBodyType = Phaser.Physics.ARCADE;
+        
         //the starting frame
+        
         
         //animations
         player.animations.add('right', [0,1,2,3,4,5,6], 13, true);
@@ -64,10 +71,25 @@ demo.state2.prototype = {
         bullets.setAll('checkWorldBounds', true);
         bullets.setAll('outOfBoundsKill', true);
         
+        //trees
+        trees = game.add.group();
+        
+        xCoord = Math.random(0, 1920);
+        yCoord = Math.random(0, 1920);
+        
+        for (var i = 0; i < 20; i++)
+            {
+                
+                tree = game.add.sprite(game.world.centerX * xCoord, game.world.centerY * yCoord, 'tree');
+                xCoord = Math.random(0, xCoord + 100)
+                yCoord = Math.random(0, yCoord + 100)
+            }
+        
+        
         cursors = game.input.keyboard.createCursorKeys();
     },
     update: function(){
-        
+
         player.body.velocity.x = 0;
         
         
@@ -124,7 +146,7 @@ demo.state2.prototype = {
 //        }
     }
 };
-
+//
 //function fire(){
 //    
 //    if(game.time.now > nextFire && bullets.countDead() > 0)
