@@ -14,5 +14,5 @@ demo.state1.prototype = {
 };
 
 function changeState(i, stateNum){
-    game.state.start('state' + stateNum);
+    game.state.start('state2');
 }
