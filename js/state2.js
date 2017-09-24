@@ -128,7 +128,7 @@ demo.state2.prototype = {
         {
             player.animations.stop(null, true)
         }
-        if (Keyboard.SPACEBAR.isDown)
+        if ((Phaser.Keyboard.SPACEBAR).isDown)
             {
                 if (look_left){
                     player.animations.play('meleeLeft');
