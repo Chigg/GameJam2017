@@ -7,13 +7,13 @@ var fireRate = 100;
 var nextFire = 0;
 var meleeSound;
 var healthpoints;
+var look_left = false;
 
 demo.state2 = function(){};
 demo.state2.prototype = {
     preload: function(){
         game.load.image('grass', 'assets/grass.png');
-        game.load.spritesheet('player', 'assets/Chef Walk.png', 50, 62);
-        game.load.spritesheet('player_melee', 'assets/Chef_hit.png', 50, 62);
+        game.load.spritesheet('player', 'assets/Chef.png', 50, 62);
         game.load.spritesheet('baddie', 'assets/Carrot.png', 50, 62);
         game.load.image('bullet', 'assets/pan.png', 25, 25);
         game.load.audio('melee_sound', 'assets/audio/melee_sound.mp3');
@@ -35,8 +35,8 @@ demo.state2.prototype = {
         player.animations.add('left', [7,8,9,10,11,12,13], 13, true);
         //player.health = 100;
         player.frame = 0;
-        player.animations.add('meleeRight', [0,1,2], 3, true);
-        player.animations.add('meleeLeft', [3,4,5], 3, true);
+        player.animations.add('meleeRight', [14,15,16], 0, true);
+        player.animations.add('meleeLeft', [17,18,19], 0, true);
         
         //audio
         meleeSound = game.add.audio('melee_sound');
@@ -75,19 +75,13 @@ demo.state2.prototype = {
         {
             player.body.velocity.x = -250;
             player.animations.play('left');
-            if(game.input.activePointer.isDown)
-            {
-                meleeLeft();
-            }
+            look_left = true;
         }
         else if (cursors.right.isDown)
         {
             player.body.velocity.x = 250;
             player.animations.play('right');
-            if(game.input.activePointer.isDown)
-            {
-                meleeRight();
-            }
+            look_left = false;
         }
         else 
         {
@@ -96,29 +90,33 @@ demo.state2.prototype = {
         if (cursors.up.isDown)
         {
             player.body.velocity.y = -250;
-            player.animations.play('left');
             
-            if(game.input.activePointer.isDown)
-            {
-                meleeLeft();
-            }
+            if(look_left){player.animations.play('left');}
+            
+            else{player.animations.play('right');}
+            
         }
         else if (cursors.down.isDown)
         {
             player.body.velocity.y = 250;
-            player.animations.play('right');
-            
-            if(game.input.activePointer.isDown)
-            {
-                meleeRight();
-        
-            }
+            if(look_left){player.animations.play('left');}
+            else{player.animations.play('right');}
         }
         if(player.body.velocity.x == 0 && player.body.velocity.y == 0)
         {
             player.animations.stop(null, true)
         }
-    
+        if (Keyboard.SPACEBAR.isDown)
+            {
+                if (look_left){
+                    player.animations.play('meleeLeft');
+                    meleeSound.play()
+                }
+                else {
+                    player.animations.play('meleeRight');
+                    meleeSound.play()
+                }
+            }
         
 //        if (game.input.activePointer.isDown)
 //        {
