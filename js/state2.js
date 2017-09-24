@@ -11,7 +11,10 @@ demo.state2 = function(){};
 demo.state2.prototype = {
     preload: function(){
         game.load.image('grass', 'assets/grass.png');
-        game.load.spritesheet('player', 'assets/Carrot.png', 50, 50);
+        game.load.spritesheet('player', 'assets/Chef Walk.png', 50, 62);
+        game.load.spritesheet('player_melee', 'assets/Chef_hit.png', 50, 62);
+        game.load.spritesheet('baddie', 'assets/Carrot.png', 50, 62);
+        game.load.image('bullet', 'assets/pan.png', 25, 25)
         
     },
     create: function(){
@@ -23,6 +26,14 @@ demo.state2.prototype = {
         game.physics.startSystem(Phaser.Physics.ARCADE);
         
         player = game.add.sprite(game.world.centerX, game.world.centerY, 'player')
+        //the starting frame
+        player.frame = 0;
+        //animations
+        player.animations.add('right', [0,1,2,3,4,5,6], 13, true);
+        player.animations.add('left', [7,8,9,10,11,12,13], 13, true);
+        player.animations.add('meleeRight',[0,1,2], 3, true);
+        player.animations.add('meleeLeft',[3,4,5], 3, true);
+        
         game.physics.arcade.enable(player);
         game.camera.follow(player);
         
@@ -32,7 +43,7 @@ demo.state2.prototype = {
         
 //        scoreText = game.add.text(16, 16, 'score: 0',                 {fontSize: '32px', fill: '#dabbed'});
         
-        //this is where we establish projectiles
+    //this is where we establish projectiles
         bullets = game.add.group();
         bullets.enableBody = true;
         bullets.physicsBodyType = Phaser.Physics.ARCADE;
@@ -46,15 +57,25 @@ demo.state2.prototype = {
     update: function(){
         
         player.body.velocity.x = 0;
-        player.body.velocity.y = 0;
+        
         
         if (cursors.left.isDown)
         {
             player.body.velocity.x = -250;
+            player.animations.play('left');
+            if(game.input.activePointer.isDown)
+            {
+                meleeLeft();
+            }
         }
         else if (cursors.right.isDown)
         {
             player.body.velocity.x = 250;
+            player.animations.play('right');
+            if(game.input.activePointer.isDown)
+            {
+                meleeRight();
+            }
         }
         else 
         {
@@ -63,34 +84,51 @@ demo.state2.prototype = {
         if (cursors.up.isDown)
         {
             player.body.velocity.y = -250;
+            player.animations.play('left');
+            
+            if(game.input.activePointer.isDown)
+            {
+                meleeRight();
+            }
         }
         else if (cursors.down.isDown)
         {
             player.body.velocity.y = 250;
+            player.animations.play('right');
+            
+            if(game.input.activePointer.isDown)
+            {
+                meleeRight();
+            }
         }
+    
         
-        if (game.input.activePointer.isDown)
-        {
-            fire();
-        }
+//        if (game.input.activePointer.isDown)
+//        {
+//            fire();
+//        }
     }
 };
 
-function fire(){
-    
-    if(game.time.now > nextFire && bullets.countDead() > 0)
-    {
-        nextFire = game.time.now + fireRate;
-        
-        var bullet = bullets.getFirstDead();
-        
-        bullet.reset(player.x - 0, player.y - 0);
-    
-        game.physics.arcade.moveToPointer(bullet, 300);
-    }
-}
+//function fire(){
+//    
+//    if(game.time.now > nextFire && bullets.countDead() > 0)
+//    {
+//        nextFire = game.time.now + fireRate;
+//        
+//        var bullet = bullets.getFirstDead();
+//        
+//        //initial firing position. Right now it is centered on player.
+//        bullet.reset(player.x, player.y);
+//    
+//        game.physics.arcade.moveToPointer(bullet, 300);
+//    }
+//}
 
-function render(){
+function meleeLeft(){
+    player.animations.play('meleeLeft');
     
-    game.debug.text('Active Bullets: ' + bullets.countLiving() + ' / ' + bullets.total, 32, 32);
+}
+function meleeRight(){
+    player.animations.play('meleeRight')
 }
