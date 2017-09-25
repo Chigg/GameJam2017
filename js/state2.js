@@ -6,7 +6,10 @@ var bullets;
 var fireRate = 100;
 var nextFire = 0;
 var meleeSound;
-var healthpoints = 100;
+var gameOverText;
+var HPText
+var playerHP = 10;
+
 var trees;
 var tree;
 var look_left = false;
@@ -33,6 +36,7 @@ demo.state2.prototype = {
         game.world.setBounds(0, 0, 1920, 1920);
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         game.stage.backgroundColor = '#008000';
+        
         attackButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         baddies = game.add.physicsGroup(Phaser.Physics.ARCADE);
         
@@ -61,11 +65,9 @@ demo.state2.prototype = {
         player.body.gravity.y = 0;
         player.body.collideWorldBounds = true;
         
-        //scoreText = game.add.text(16, 16, 'score: 0',                 {fontSize: '32px', fill: '#dabbed'});
         
-        //this is for stats. A simple HUD
-        //healthpoints = game.add.text(game.world.centerX, game.world.centerY, 'Health: ' + player.health +'%', {font: '20px Arial', fill: '#fff'});
-        
+        HPText = game.add.text(16, 16, 'Health: ' + playerHP, {fontSize: '32px', fill: '#000'});
+       
         // enemy spawns and behavior
         baddies = game.add.group();
         baddies.enableBody = true;
@@ -73,7 +75,7 @@ demo.state2.prototype = {
         xCoord = Math.random(0, 1920);
         yCoord = Math.random(0, 1920);
         
-        for (var i = 0; i < 16; i++)
+        for (var i = 0; i < 5; i++)
             {
                 //the i at the end randomizes the animation they spawn in with
                 var baddie = baddies.create(game.world.randomX, game.world.randomY, 'baddie', i);
@@ -82,8 +84,8 @@ demo.state2.prototype = {
         //baddie animations
         baddie.animations.add('bRight',[5,6,7], 16, true);
         baddie.animations.add('bLeft',[8,9,10], 16, true);
-        baddie.animations.add('meleeRight', [0,1,2], false);
-        baddie.animations.add('meleeLeft', [13,14,15], false);
+        baddie.animations.add('meleeRight', [0,1,2], true);
+        baddie.animations.add('meleeLeft', [13,14,15], true);
         
     //this is where we establish projectiles
         bullets = game.add.group();
@@ -98,7 +100,7 @@ demo.state2.prototype = {
         xCoord = Math.random(0, 1920);
         yCoord = Math.random(0, 1920);
         
-        for (var i = 0; i < 20; i++)
+        for (var i = 0; i < 5; i++)
             {
                 
                 tree = game.add.sprite(game.world.centerX * xCoord, game.world.centerY * yCoord, 'tree');
@@ -129,15 +131,21 @@ demo.state2.prototype = {
 //            game.time.events.add(Phaser.Timer.SECOND * 4, spawnEnemy, this);
 //            spawning = false;
 //        }
-//        
+        
+        // text is locked in upper left corner
+        HPText.fixedToCamera = true;
+        HPText.cameraOffset.setTo(0,0);
+
+        
+        baddies.forEach(move);
         
         cursors = game.input.keyboard.createCursorKeys();
 
-        game.physics.arcade.overlap(player,baddies,resetGame);
+        game.physics.arcade.overlap(player, baddies, loseHealth, null, this);
+        
         
         if (w.isDown || a.isDown || s.isDown || d.isDown)
         {
-            baddies.forEach(move);
             
             if (d.isDown){
                 player.x += 4;
@@ -161,28 +169,33 @@ demo.state2.prototype = {
                 player.y -= 4;
                 if(look_left){player.animations.play('left');}
                 else{player.animations.play('right');}
-
             }
-            if (attackButton.isDown && game.time.now > attackTimer)
-                {
-                    attackTimer = game.time.now + 300;
-                    if (look_left){
-                        player.animations.play('meleeLeft');
-                        meleeSound.play()
-                    }
-                    else {
-                        player.animations.play('meleeRight');
-                        meleeSound.play()
-                    }
-                    
-                }
         }
-        else
-        {
+        else {
             player.animations.stop(null, true)
             baddies.setAll('body.velocity.x',0);
             baddies.setAll('body.velocity.y',0);
-            
+        }
+        
+       // console.log(player.meleeRight.animations.currentAnim.isPlaying); 
+        
+        if (attackButton.isDown) {
+            //&& game.time.now > attackTimer
+            // attackTimer = game.time.now + 300;
+            if (look_left){
+                player.animations.play('meleeLeft');
+                meleeSound.play()
+            }
+             else {
+                player.animations.play('meleeRight');
+                meleeSound.play()
+             }
+                    
+                }
+        
+        // game over if player loses all health
+        if (playerHP <= 0) {
+            resetGame();
         }
     }
 };
@@ -207,20 +220,37 @@ demo.state2.prototype = {
 //        game.physics.arcade.moveToPointer(bullet, 300);
 //    }
 //}
-function move(baddie){
-    game.physics.arcade.moveToObject(baddie,player,60,enemyspeed*1000);
+
+// player loses health when hit by enemy
+function loseHealth (player, baddies) {
+    playerHP -= 1;
+    HPText.text = 'Health: ' + playerHP;
+    
+}
+
+
+function move(baddie) {
+    game.physics.arcade.moveToObject(baddie,player,60,enemyspeed*2000);
     baddie.animations.play("bRight");
 }
-function resetGame(){
+
+function resetGame() {
     //once a carrot touches a player, it'll activate resetGame() function.
     //We should make a state 3 which is essentially the same as state1, only with a title screen that says "Game Over. (newline) Hit spacebar to continue."
     //that will take the player to state1, this giving them the option to play again.
+    
+    //gameOverText = game.add.text(100, 100, 'GAME OVER',{fontSize: '32px', fill: '#000'});
+//    newText(game, 200, 200, 'Press spacebar to restart');
+//    
+    game.state.start(state1);
+    
 }
 
 function meleeLeft(){
     player.animations.play('meleeLeft');
     meleeSound.play()
 }
+
 function meleeRight(){
     player.animations.play('meleeRight')
     meleeSound.play()
