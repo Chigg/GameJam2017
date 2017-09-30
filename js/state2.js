@@ -18,6 +18,7 @@ var enemyspeed = 0.9;
 var baddiesHP = 25;
 var attackTimer = 0;
 var attackButton;
+var timer;
 
 demo.state2 = function(){};
 demo.state2.prototype = {
@@ -32,6 +33,9 @@ demo.state2.prototype = {
     },
     
     create: function(){
+        timer = game.time.create(false);
+        timer.loop(4000,spawnEnemy, this);
+        timer.start();
         background = game.add.tileSprite(0, 0, 1920, 1920, 'grass');
         game.world.setBounds(0, 0, 1920, 1920);
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -122,15 +126,6 @@ demo.state2.prototype = {
     
     
     update: function(){
-        
-        //intended to continously spawn enemies every 4 seconds by calling the spawnEnemy() function
-        //at the moment once it starts spawning enemies it doesn't stop, so it crashes
-//        
-//        if (spawning = true)
-//        {
-//            game.time.events.add(Phaser.Timer.SECOND * 4, spawnEnemy, this);
-//            spawning = false;
-//        }
         
         // text is locked in upper left corner
         HPText.fixedToCamera = true;
